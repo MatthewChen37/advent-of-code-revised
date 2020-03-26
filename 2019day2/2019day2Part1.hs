@@ -5,6 +5,7 @@ import Prelude hiding (drop)
 main = do
     handle <- openFile "2019day2.in" ReadMode
     contents <- hGetContents handle
+
     let parsed_values = splitOn "," contents --gets a list of stringed-integers
     let parsed_integers = map parse parsed_values --gets a list of parsed integers from the strings
     let parsed_sequence = fromList parsed_integers
@@ -25,23 +26,23 @@ add_initial_condition sequence =
 
 
 process_entire :: Seq Int -> Seq Int
-process_entire x = process x x 0
+process_entire x = process x x
 
-process :: Seq Int -> Seq Int -> Int -> Seq Int
-process writing_copy reading_copy index
-    |opCode == 1 = add writing_copy (drop 1 reading_copy) (index + 1)
-    |opCode == 2 = multiply writing_copy (drop 1 reading_copy) (index + 1)
+process :: Seq Int -> Seq Int -> Seq Int
+process writing_copy reading_copy
+    |opCode == 1 = add writing_copy (drop 1 reading_copy)
+    |opCode == 2 = multiply writing_copy (drop 1 reading_copy)
     |opCode == 99 = writing_copy
     where opCode = index reading_copy 0
 
 
-add :: Seq Int -> Seq Int -> Int -> Seq Int
-add writing_copy reading_copy index =
-    process (update (index * 4) sum writing_copy) (drop 3 reading_copy) index
+add :: Seq Int -> Seq Int -> Seq Int
+add writing_copy reading_copy =
+    process (update (index reading_copy 2) sum writing_copy) (drop 3 reading_copy)
     where sum = index writing_copy (index reading_copy 0) + index writing_copy (index reading_copy 1)
 
 
-multiply :: Seq Int -> Seq Int -> Int -> Seq Int
-multiply writing_copy reading_copy index =
-    process (update (index * 4) product writing_copy) (drop 3 reading_copy) index
+multiply :: Seq Int -> Seq Int -> Seq Int
+multiply writing_copy reading_copy =
+    process (update (index reading_copy 2) product writing_copy) (drop 3 reading_copy)
     where product = index writing_copy (index reading_copy 0) * index writing_copy (index reading_copy 1)
