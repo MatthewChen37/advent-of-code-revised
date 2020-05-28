@@ -1,9 +1,10 @@
 import System.IO
 import Prelude
 import Data.List.Split
+import Debug.Trace
 
 main = do
-    handle <- openFile "2019day3.in" ReadMode
+    handle <- openFile "simpleDataSet.in" ReadMode
     contents <- hGetContents handle
     let paths = lines contents
     -- IO that splits the input file into two different arrays
@@ -11,6 +12,8 @@ main = do
     let second_path = splitOn "," (paths !! 1)
 
     let first_path_points = generatePath first_path
+    let second_path_points = generatePath second_path
+
     print first_path_points
 
 
@@ -26,9 +29,14 @@ generatePoints input list_of_points
     |direction == 'D' = goDown input list_of_points
     |direction == 'L' = goLeft  input list_of_points
     |direction == 'R' = goRight input list_of_points
-    |direction == '\n' = list_of_points
-    where direction = head (head input)
+    |direction == 'S' = list_of_points
+    where direction = getHead input
 
+getHead :: [String] -> Char
+getHead input =
+    if null input
+        then 'S' -- S is for stop
+        else head (head input)
 
 goUp :: [String] -> [(Int, Int)] -> [(Int, Int)]
 goUp string_path list_of_points =
