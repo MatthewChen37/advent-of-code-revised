@@ -10,56 +10,85 @@ main = do
     let first_path = splitOn "," (head paths)
     let second_path = splitOn "," (paths !! 1)
 
-    let first_path_points = generate_path first_path
-
+    let first_path_points = generatePath first_path
     print first_path_points
 
 
-generate_path :: [String] -> [(Int,Int)]
-generate_path path =
-    generate_points path [(0,0)]
+generatePath :: [String] -> [(Int,Int)]
+generatePath path =
+    generatePoints path [(0,0)]
     --list of points is of type [[(Int, Int)]]
     --TODO: break down the lists of lists into a continuous list
 
-generate_points :: (Int,Int) -> [String] -> [(Int, Int)] -> [(Int,Int)]
-generate_points input list_of_points
-    |direction == 'U' = go_up input list_of_points
-    |direction == 'D' = go_down input list_of_points
-    |direction == 'L' = go_left  input list_of_points
-    |direction == 'R' = go_right input list_of_points
+generatePoints :: [String] -> [(Int, Int)] -> [(Int,Int)]
+generatePoints input list_of_points
+    |direction == 'U' = goUp input list_of_points
+    |direction == 'D' = goDown input list_of_points
+    |direction == 'L' = goLeft  input list_of_points
+    |direction == 'R' = goRight input list_of_points
     |direction == '\n' = list_of_points
-    where direction = head (input !! 0)
-
-go_up string_path list_of_points =
-    let parsed_int = parse_current string_path
-    in tuple_up parsed_int list_of_points
-
-tuple_up :: Int -> [String] -> [(Int, Int)]
-
-tuple_up 0 list_of_points = list_of_points
-tuple_up increment list_of_points =
-    let last_point = tail list_of_points
-        new_point = ((fst last_point), (snd last_point) + 1)
-        new_list_of_points = list_of_points ++ new_point
-    in tuple_up (increment - 1) new_list_of_points
-
-go_down :: [String] -> [(Int, Int)]
-go_down string_number list_of_points =
-    let parsed_int = parse_current string_path
-
-go_left :: [String] -> [(Int, Int)]
-go_left string_number list_of_points =
-    let parsed_int = parse_current string_path
-
-go_right :: [String] -> [(Int, Int)]
-go_right string_number list_of_points =
-    let parsed_int = parse_current string_path
+    where direction = head (head input)
 
 
+goUp :: [String] -> [(Int, Int)] -> [(Int, Int)]
+goUp string_path list_of_points =
+    let parsed_int = parseCurrent string_path
+        new_list_of_points = tupleUp parsed_int list_of_points
+    in generatePoints (drop 1 string_path) new_list_of_points
 
-parse_current :: [String] -> Int
-parse_current path =
-    read (tail (path !! 0)) :: Int
+tupleUp :: Int -> [(Int, Int)] -> [(Int, Int)]
+tupleUp 0 list_of_points = list_of_points
+tupleUp increment list_of_points =
+    let last_point = last list_of_points
+        new_point = (fst last_point, snd last_point + 1)
+        new_list_of_points = list_of_points ++ [new_point]
+    in tupleUp (increment - 1) new_list_of_points
+
+goDown :: [String] -> [(Int, Int)] -> [(Int, Int)]
+goDown string_path list_of_points =
+    let parsed_int = parseCurrent string_path
+        new_list_of_points = tupleDown parsed_int list_of_points
+    in generatePoints (drop 1 string_path) new_list_of_points
+
+tupleDown :: Int -> [(Int, Int)] -> [(Int, Int)]
+tupleDown 0 list_of_points = list_of_points
+tupleDown increment list_of_points =
+    let last_point = last list_of_points
+        new_point = (fst last_point, snd last_point - 1)
+        new_list_of_points = list_of_points ++ [new_point]
+    in tupleDown (increment - 1) new_list_of_points
+
+goLeft :: [String] -> [(Int, Int)] -> [(Int, Int)]
+goLeft string_path list_of_points =
+    let parsed_int = parseCurrent string_path
+        new_list_of_points = tupleLeft parsed_int list_of_points
+    in generatePoints (drop 1 string_path) new_list_of_points
+
+tupleLeft :: Int -> [(Int, Int)] -> [(Int, Int)]
+tupleLeft 0 list_of_points = list_of_points
+tupleLeft increment list_of_points =
+    let last_point = last list_of_points
+        new_point = (fst last_point - 1, snd last_point)
+        new_list_of_points = list_of_points ++ [new_point]
+    in tupleLeft (increment - 1) new_list_of_points
+
+goRight :: [String] -> [(Int, Int)] -> [(Int, Int)]
+goRight string_path list_of_points =
+    let parsed_int = parseCurrent string_path
+        new_list_of_points = tupleRight parsed_int list_of_points
+    in generatePoints (drop 1 string_path) new_list_of_points
+
+tupleRight :: Int -> [(Int, Int)] -> [(Int, Int)]
+tupleRight 0 list_of_points = list_of_points
+tupleRight increment list_of_points =
+    let last_point = last list_of_points
+        new_point = (fst last_point + 1, snd last_point)
+        new_list_of_points = list_of_points ++ [new_point]
+    in tupleRight (increment - 1) new_list_of_points
+
+parseCurrent :: [String] -> Int
+parseCurrent path =
+    read (tail (head path)) :: Int
 
 
 -- go through each string
